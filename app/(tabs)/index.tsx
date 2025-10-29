@@ -49,19 +49,11 @@ export default function DashboardScreen() {
   };
 
   const handleStrategyCreator = () => {
-    Alert.alert(
-      "Criador de Estratégias",
-      "Planeje estratégias personalizadas com base no público-alvo, orçamento e objetivos da campanha.",
-      [{ text: "OK" }]
-    );
+    router.push("/strategy");
   };
 
   const handleSocialMonitor = () => {
-    Alert.alert(
-      "Monitor de Redes Sociais",
-      "Acompanhe menções, hashtags e tendências relacionadas à sua campanha em tempo real.",
-      [{ text: "OK" }]
-    );
+    router.push("/social-monitor");
   };
 
   const createCampaign = () => {

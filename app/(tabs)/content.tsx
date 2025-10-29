@@ -119,7 +119,10 @@ export default function ContentScreen() {
           text: "Eliminar",
           style: "destructive",
           onPress: () => {
-            setSavedContents(savedContents.filter(c => c.id !== id));
+            console.log("Eliminando conteúdo com ID:", id);
+            const newContents = savedContents.filter(c => c.id !== id);
+            setSavedContents(newContents);
+            console.log("Conteúdo eliminado. Total restante:", newContents.length);
             Alert.alert("Sucesso", "Conteúdo eliminado com sucesso!");
           },
         },

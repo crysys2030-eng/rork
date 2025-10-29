@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { LayoutDashboard, Calendar, Users, FileText, Settings } from "lucide-react-native";
+import { LayoutDashboard, Calendar, Users, FileText, Settings, Target } from "lucide-react-native";
 import React from "react";
 
 export default function TabLayout() {
@@ -38,6 +38,13 @@ export default function TabLayout() {
         options={{
           title: "Contatos",
           tabBarIcon: ({ color }) => <Users size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="campaigns"
+        options={{
+          title: "Campanhas",
+          tabBarIcon: ({ color }) => <Target size={24} color={color} />,
         }}
       />
       <Tabs.Screen

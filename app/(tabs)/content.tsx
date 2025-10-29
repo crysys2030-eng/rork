@@ -328,7 +328,9 @@ export default function ContentScreen() {
                   activeOpacity={0.7}
                 >
                   <View style={styles.savedCardHeader}>
-                    <Text style={styles.savedCardType}>{getContentTypeTitle()}</Text>
+                    <Text style={styles.savedCardType}>
+                      {saved.type === "speech" ? "Discurso" : saved.type === "social" ? "Redes Sociais" : "Resposta"}
+                    </Text>
                     <Text style={styles.savedCardDate}>
                       {new Date(saved.date).toLocaleDateString("pt-PT", {
                         day: "numeric",

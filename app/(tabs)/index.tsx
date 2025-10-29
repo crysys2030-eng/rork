@@ -33,11 +33,7 @@ export default function DashboardScreen() {
   };
 
   const handleSentimentAnalysis = () => {
-    Alert.alert(
-      "Análise de Sentimento",
-      "Ferramenta disponível em breve para analisar o sentimento dos eleitores nas redes sociais e feedback.",
-      [{ text: "OK" }]
-    );
+    router.push("/sentiment");
   };
 
   const handleSloganGenerator = () => {
@@ -45,19 +41,11 @@ export default function DashboardScreen() {
   };
 
   const handleDebateAssistant = () => {
-    Alert.alert(
-      "Assistente de Debate",
-      "Prepare-se para debates com argumentos, respostas e pontos-chave organizados por tópico.",
-      [{ text: "OK" }]
-    );
+    router.push("/debate");
   };
 
   const handleDataAnalysis = () => {
-    Alert.alert(
-      "Análise de Dados",
-      "Visualize métricas da campanha, tendências e insights baseados em dados coletados.",
-      [{ text: "OK" }]
-    );
+    router.push("/analytics");
   };
 
   const handleStrategyCreator = () => {

@@ -12,8 +12,11 @@ const queryClient = new QueryClient();
 
 function RootLayoutNav() {
   return (
-    <Stack screenOptions={{ headerBackTitle: "Back" }}>
+    <Stack screenOptions={{ headerBackTitle: "Voltar" }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="sentiment" options={{ headerShown: true }} />
+      <Stack.Screen name="debate" options={{ headerShown: true }} />
+      <Stack.Screen name="analytics" options={{ headerShown: true }} />
     </Stack>
   );
 }

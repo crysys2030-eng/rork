@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from "react-native";
 import { Stack } from "expo-router";
-import { Calendar, MapPin, Clock, Plus, Search, Trash2, X } from "lucide-react-native";
+import { Calendar, MapPin, Clock, Plus, Search, X } from "lucide-react-native";
 import React, { useState } from "react";
 
 type Event = {
@@ -79,27 +79,7 @@ export default function AgendaScreen() {
     Alert.alert("Sucesso", "Evento adicionado com sucesso!");
   };
 
-  const deleteEvent = (id: string) => {
-    console.log("Attempting to delete event with id:", id);
-    Alert.alert(
-      "Confirmar Eliminação",
-      "Tem a certeza que deseja eliminar este evento?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: () => {
-            console.log("Deleting event", id);
-            const updatedEvents = events.filter((e) => e.id !== id);
-            setEvents(updatedEvents);
-            console.log("Event deleted, remaining events:", updatedEvents.length);
-            Alert.alert("Sucesso", "Evento eliminado com sucesso!");
-          },
-        },
-      ]
-    );
-  };
+
 
   const getEventColor = (type: string) => {
     switch (type) {
@@ -186,13 +166,6 @@ export default function AgendaScreen() {
                 </View>
               </View>
             </View>
-            
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => deleteEvent(event.id)}
-            >
-              <Trash2 size={20} color="#dc2626" />
-            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
@@ -390,14 +363,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6b7280",
   },
-  deleteButton: {
-    width: 48,
-    height: 48,
-    alignItems: "center" as const,
-    justifyContent: "center" as const,
-    alignSelf: "center" as const,
-    marginRight: 8,
-  },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

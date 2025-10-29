@@ -9,7 +9,7 @@ import {
   Alert 
 } from "react-native";
 import { Stack } from "expo-router";
-import { Target, Search, Plus, Trash2, X, Calendar, Users, TrendingUp } from "lucide-react-native";
+import { Target, Search, Plus, X, Calendar, Users, TrendingUp } from "lucide-react-native";
 import React, { useState } from "react";
 
 type Campaign = {
@@ -102,27 +102,7 @@ export default function CampaignsScreen() {
     Alert.alert("Sucesso", "Campanha criada com sucesso!");
   };
 
-  const deleteCampaign = (id: string) => {
-    console.log("Attempting to delete campaign with id:", id);
-    Alert.alert(
-      "Confirmar Eliminação",
-      "Tem a certeza que deseja eliminar esta campanha?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: () => {
-            console.log("Deleting campaign", id);
-            const updatedCampaigns = campaigns.filter((c) => c.id !== id);
-            setCampaigns(updatedCampaigns);
-            console.log("Campaign deleted, remaining campaigns:", updatedCampaigns.length);
-            Alert.alert("Sucesso", "Campanha eliminada com sucesso!");
-          },
-        },
-      ]
-    );
-  };
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -212,14 +192,6 @@ export default function CampaignsScreen() {
                 <Text style={styles.detailText}>Orçamento: {campaign.budget}</Text>
               </View>
             </View>
-
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => deleteCampaign(campaign.id)}
-            >
-              <Trash2 size={18} color="#dc2626" />
-              <Text style={styles.deleteButtonText}>Eliminar</Text>
-            </TouchableOpacity>
           </View>
         ))}
 
@@ -452,22 +424,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#6b7280",
   },
-  deleteButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: "#fee2e2",
-    marginTop: 4,
-  },
-  deleteButtonText: {
-    fontSize: 14,
-    fontWeight: "600" as const,
-    color: "#dc2626",
-  },
+
   emptyState: {
     alignItems: "center",
     justifyContent: "center",

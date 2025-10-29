@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from "react-native";
 import { Stack } from "expo-router";
-import { Users, Search, Plus, Phone, Mail, MapPin, Trash2, X } from "lucide-react-native";
+import { Users, Search, Plus, Phone, Mail, MapPin, X } from "lucide-react-native";
 import React, { useState } from "react";
 
 type Contact = {
@@ -88,27 +88,7 @@ export default function ContactsScreen() {
     Alert.alert("Sucesso", "Contato adicionado com sucesso!");
   };
 
-  const deleteContact = (id: string) => {
-    console.log("Attempting to delete contact with id:", id);
-    Alert.alert(
-      "Confirmar Eliminação",
-      "Tem a certeza que deseja eliminar este contato?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: () => {
-            console.log("Deleting contact", id);
-            const updatedContacts = contacts.filter((c) => c.id !== id);
-            setContacts(updatedContacts);
-            console.log("Contact deleted, remaining contacts:", updatedContacts.length);
-            Alert.alert("Sucesso", "Contato eliminado com sucesso!");
-          },
-        },
-      ]
-    );
-  };
+
 
   const filters = [
     { id: "all", label: "Todos" },
@@ -234,13 +214,6 @@ export default function ContactsScreen() {
                 </View>
               </View>
             </View>
-            
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => deleteContact(contact.id)}
-            >
-              <Trash2 size={20} color="#dc2626" />
-            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
@@ -472,14 +445,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#6b7280",
   },
-  deleteButton: {
-    width: 48,
-    height: 48,
-    alignItems: "center" as const,
-    justifyContent: "center" as const,
-    alignSelf: "center" as const,
-    marginLeft: 8,
-  },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

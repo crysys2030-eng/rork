@@ -11,6 +11,7 @@ import {
 import { Stack } from "expo-router";
 import { MessageCircle, Lightbulb, AlertCircle } from "lucide-react-native";
 import React, { useState } from "react";
+import { generateText } from "@rork/toolkit-sdk";
 
 type DebatePoint = {
   argument: string;
@@ -28,42 +29,55 @@ export default function DebateScreen() {
     
     setIsPreparing(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log("Preparando debate com AI para:", topic);
       
-      const mockPoints: DebatePoint[] = [
-        {
-          argument: "Posição principal sobre o tema",
-          counterArgument: "Como responder a críticas comuns",
-          keyPoints: [
-            "Apresente dados e estatísticas relevantes",
-            "Use exemplos concretos da comunidade",
-            "Mantenha um tom respeitoso mas firme"
-          ]
-        },
-        {
-          argument: "Benefícios para a comunidade",
-          counterArgument: "Aborde preocupações sobre custos",
-          keyPoints: [
-            "Destaque o retorno a longo prazo",
-            "Compare com outras soluções",
-            "Mostre casos de sucesso"
-          ]
-        },
-        {
-          argument: "Implementação prática",
-          counterArgument: "Responda dúvidas sobre viabilidade",
-          keyPoints: [
-            "Apresente um plano claro e realista",
-            "Identifique recursos disponíveis",
-            "Estabeleça metas mensuráveis"
-          ]
+      const analysis = await generateText({
+        messages: [
+          { 
+            role: "user", 
+            content: `Você é um consultor especializado em preparação de debates políticos. Prepare 3 pontos de debate para o seguinte tema: "${topic}"
+
+Retorne APENAS um JSON válido (sem markdown) com esta estrutura:
+[
+  {
+    "argument": "argumento principal",
+    "counterArgument": "como responder a críticas",
+    "keyPoints": ["ponto 1", "ponto 2", "ponto 3"]
+  },
+  ... (mais 2 objetos)
+]
+
+Os argumentos devem ser em português de Portugal, profissionais, persuasivos e baseados em factos. Cada ponto-chave deve ser acionável e específico.` 
+          }
+        ]
+      });
+      
+      console.log("Análise recebida:", analysis.substring(0, 200));
+      
+      let parsedPoints: DebatePoint[];
+      try {
+        const cleanJson = analysis.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        parsedPoints = JSON.parse(cleanJson);
+        
+        if (!Array.isArray(parsedPoints) || parsedPoints.length === 0) {
+          throw new Error("Formato inválido");
         }
-      ];
+        
+        parsedPoints = parsedPoints.map(point => ({
+          ...point,
+          keyPoints: point.keyPoints.slice(0, 3)
+        }));
+        
+      } catch (parseError) {
+        console.error("Erro ao fazer parse do JSON:", parseError);
+        throw new Error("Formato de resposta inválido");
+      }
       
-      setDebatePoints(mockPoints);
+      console.log("Debate preparado com sucesso");
+      setDebatePoints(parsedPoints);
     } catch (error) {
-      console.error("Error preparing debate:", error);
-      Alert.alert("Erro", "Não foi possível preparar o debate.");
+      console.error("Erro ao preparar debate:", error);
+      Alert.alert("Erro", "Não foi possível preparar o debate. Por favor, tente novamente.");
     } finally {
       setIsPreparing(false);
     }

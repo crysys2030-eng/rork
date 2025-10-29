@@ -11,6 +11,7 @@ import {
 import { Stack } from "expo-router";
 import { MessageSquare, TrendingUp, TrendingDown, Minus } from "lucide-react-native";
 import React, { useState } from "react";
+import { generateText } from "@rork/toolkit-sdk";
 
 type SentimentResult = {
   overall: "positive" | "negative" | "neutral";
@@ -28,47 +29,50 @@ export default function SentimentScreen() {
     
     setIsAnalyzing(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log("Analisando sentimento com AI...");
       
-      const words = text.toLowerCase();
-      let score = 50;
-      
-      const positiveWords = ["ótimo", "excelente", "bom", "melhor", "apoio", "concordo", "gosto", "parabéns"];
-      const negativeWords = ["ruim", "péssimo", "contra", "discordo", "não gosto", "problema", "erro"];
-      
-      positiveWords.forEach(word => {
-        if (words.includes(word)) score += 10;
+      const analysis = await generateText({
+        messages: [
+          { 
+            role: "user", 
+            content: `Você é um especialista em análise de sentimento político. Analise o seguinte texto e retorne APENAS um JSON válido com esta estrutura exata:
+{
+  "overall": "positive" ou "negative" ou "neutral",
+  "score": número de 0 a 100,
+  "insights": ["insight 1", "insight 2", "insight 3"]
+}
+
+Texto para analisar: ${text}
+
+RETORNE APENAS O JSON, SEM TEXTO ADICIONAL.` 
+          }
+        ]
       });
       
-      negativeWords.forEach(word => {
-        if (words.includes(word)) score -= 10;
-      });
+      console.log("Análise recebida:", analysis);
       
-      score = Math.max(0, Math.min(100, score));
-      
-      let overall: "positive" | "negative" | "neutral" = "neutral";
-      if (score > 60) overall = "positive";
-      else if (score < 40) overall = "negative";
-      
-      const insights: string[] = [];
-      if (overall === "positive") {
-        insights.push("O sentimento geral é positivo");
-        insights.push("Boa recepção do público");
-        insights.push("Continue com esta abordagem");
-      } else if (overall === "negative") {
-        insights.push("O sentimento geral é negativo");
-        insights.push("Considere ajustar a mensagem");
-        insights.push("Responda às preocupações levantadas");
-      } else {
-        insights.push("O sentimento é neutro");
-        insights.push("Pode precisar de uma mensagem mais clara");
-        insights.push("Tente ser mais específico");
+      let parsedResult: SentimentResult;
+      try {
+        const cleanJson = analysis.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        parsedResult = JSON.parse(cleanJson);
+      } catch (parseError) {
+        console.error("Erro ao fazer parse do JSON:", parseError);
+        throw new Error("Formato de resposta inválido");
       }
       
-      setResult({ overall, score, insights });
+      if (parsedResult.insights.length < 3) {
+        parsedResult.insights = [
+          ...parsedResult.insights,
+          "Análise baseada em contexto político",
+          "Recomenda-se monitorização contínua"
+        ].slice(0, 4);
+      }
+      
+      console.log("Análise processada com sucesso");
+      setResult(parsedResult);
     } catch (error) {
-      console.error("Error analyzing sentiment:", error);
-      Alert.alert("Erro", "Não foi possível analisar o sentimento.");
+      console.error("Erro ao analisar sentimento:", error);
+      Alert.alert("Erro", "Não foi possível analisar o sentimento. Por favor, tente novamente.");
     } finally {
       setIsAnalyzing(false);
     }

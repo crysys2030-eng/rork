@@ -12,6 +12,7 @@ import {
 import { Stack } from "expo-router";
 import { Sparkles, FileText, Share2, Copy, Download, Trash2, Save } from "lucide-react-native";
 import React, { useState } from "react";
+import { generateText } from "@rork/toolkit-sdk";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import * as Clipboard from "expo-clipboard";
@@ -57,28 +58,36 @@ export default function ContentScreen() {
     
     setIsGenerating(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log("Gerando conteúdo com AI para:", selectedType, prompt);
       
-      const mockContent = getMockContentForType(selectedType, prompt);
-      setGeneratedContent(mockContent);
+      const systemPrompt = getSystemPromptForType(selectedType);
+      const content = await generateText({
+        messages: [
+          { role: "user", content: `${systemPrompt}\n\nPalavras-chave/Tema: ${prompt}` }
+        ]
+      });
+      
+      console.log("Conteúdo gerado com sucesso:", content.substring(0, 100));
+      setGeneratedContent(content);
     } catch (error) {
-      console.error("Error generating content:", error);
-      setGeneratedContent("Erro ao gerar conteúdo. Por favor, tente novamente.");
+      console.error("Erro ao gerar conteúdo:", error);
+      Alert.alert("Erro", "Não foi possível gerar o conteúdo. Por favor, tente novamente.");
+      setGeneratedContent("");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const getMockContentForType = (type: ContentType, userPrompt: string): string => {
+  const getSystemPromptForType = (type: ContentType): string => {
     switch (type) {
       case "speech":
-        return `Caros concidadãos,\n\nÉ com grande honra que me dirijo a vocês hoje para falar sobre ${userPrompt}.\n\nVivemos tempos de grandes desafios, mas também de grandes oportunidades. É fundamental que trabalhemos juntos para construir um futuro melhor para todos.\n\nAs nossas propostas visam:\n• Melhorar a qualidade de vida dos cidadãos\n• Fortalecer as instituições democráticas\n• Promover o desenvolvimento sustentável\n• Garantir justiça social para todos\n\nConto com o vosso apoio nesta jornada. Juntos, podemos fazer a diferença!\n\nMuito obrigado.`;
+        return "Você é um redator profissional de discursos políticos. Crie um discurso político completo, inspirador e bem estruturado em português de Portugal. O discurso deve ser persuasivo, usar linguagem formal mas acessível, incluir chamadas à ação e estar bem organizado em parágrafos. Deve ter entre 300-500 palavras e abordar os temas mencionados de forma profunda e impactante.";
       case "social":
-        return `🎯 ${userPrompt}\n\n✨ É hora de mudança! Nossa proposta visa trazer melhorias concretas para todos os cidadãos.\n\n💪 Juntos somos mais fortes!\n\n#PolíticaPositiva #Mudança #Futuro #Juntos`;
+        return "Você é um especialista em gestão de redes sociais políticas. Crie um post envolvente e profissional para redes sociais em português de Portugal. O post deve ser conciso (150-200 palavras), usar emojis apropriados, incluir hashtags relevantes e ter um tom positivo e motivacional. Deve captar atenção imediatamente e incentivar o engajamento.";
       case "response":
-        return `Agradecemos a preocupação levantada sobre ${userPrompt}.\n\nÉ importante esclarecer que:\n\n1. Estamos comprometidos com a transparência e o diálogo aberto com todos os cidadãos.\n\n2. As nossas políticas são baseadas em evidências e no melhor interesse da comunidade.\n\n3. Continuaremos a trabalhar incansavelmente para servir o público com dedicação e integridade.\n\nEstamos sempre disponíveis para ouvir sugestões e preocupações. A nossa porta está sempre aberta.`;
+        return "Você é um consultor de comunicação política. Crie uma resposta estratégica e diplomática em português de Portugal. A resposta deve ser profissional, respeitosa, abordar preocupações de forma transparente e construtiva. Deve demonstrar empatia, apresentar factos e manter um tom conciliador mas firme. Entre 200-300 palavras.";
       default:
-        return "Conteúdo gerado com base na sua solicitação.";
+        return "Crie conteúdo político profissional em português de Portugal baseado no tema fornecido.";
     }
   };
 

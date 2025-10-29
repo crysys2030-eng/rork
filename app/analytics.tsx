@@ -6,13 +6,16 @@ import {
   TouchableOpacity 
 } from "react-native";
 import { Stack } from "expo-router";
-import { BarChart3, TrendingUp, Users, Calendar, Target } from "lucide-react-native";
-import React, { useState } from "react";
+import { BarChart3, TrendingUp, Users, Calendar, Target, Sparkles } from "lucide-react-native";
+import React, { useState, useEffect } from "react";
+import { generateText } from "@rork/toolkit-sdk";
 
 type TimePeriod = "week" | "month" | "year";
 
 export default function AnalyticsScreen() {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>("month");
+  const [aiInsights, setAiInsights] = useState<string[]>([]);
+  const [isGeneratingInsights, setIsGeneratingInsights] = useState<boolean>(false);
 
   const periods: { id: TimePeriod; label: string }[] = [
     { id: "week", label: "Semana" },
@@ -58,6 +61,64 @@ export default function AnalyticsScreen() {
   ];
 
   const maxValue = Math.max(...chartData.map(d => d.value));
+
+  const generateAIInsights = async () => {
+    setIsGeneratingInsights(true);
+    try {
+      console.log("Gerando insights com AI...");
+      
+      const dataContext = `
+Métricas da campanha:
+- Novos Contatos: 247 (+18%)
+- Eventos Realizados: 12 (+3)
+- Taxa de Engajamento: 68% (+12%)
+
+Atividade da semana:
+Segunda: 65, Terça: 78, Quarta: 52, Quinta: 88, Sexta: 75, Sábado: 95, Domingo: 82
+
+Período selecionado: ${selectedPeriod === 'week' ? 'Semana' : selectedPeriod === 'month' ? 'Mês' : 'Ano'}
+`;
+      
+      const analysis = await generateText({
+        messages: [
+          { 
+            role: "user", 
+            content: `Você é um analista de dados político experiente. Analise os seguintes dados e retorne APENAS um JSON válido (sem markdown) com insights acionáveis:
+{
+  "insights": ["insight 1", "insight 2", "insight 3", "insight 4"]
+}
+
+Dados:${dataContext}
+
+Cada insight deve ser:
+- Específico e baseado nos dados
+- Acionável (incluir recomendações)
+- Em português de Portugal
+- Focado em estratégias de campanha política
+- Entre 15-25 palavras` 
+          }
+        ]
+      });
+      
+      const cleanJson = analysis.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const parsedInsights = JSON.parse(cleanJson);
+      
+      setAiInsights(parsedInsights.insights || []);
+      console.log("Insights gerados com sucesso");
+    } catch (error) {
+      console.error("Erro ao gerar insights:", error);
+      setAiInsights([
+        "Erro ao gerar insights. Os dados são promissores e mostram crescimento constante.",
+        "Continue monitorando as métricas principais para identificar tendências.",
+      ]);
+    } finally {
+      setIsGeneratingInsights(false);
+    }
+  };
+
+  useEffect(() => {
+    generateAIInsights();
+  }, [selectedPeriod]);
 
   return (
     <View style={styles.container}>
@@ -140,43 +201,35 @@ export default function AnalyticsScreen() {
         </View>
 
         <View style={styles.insightsCard}>
-          <Text style={styles.insightsTitle}>Insights Principais</Text>
+          <View style={styles.insightsHeader}>
+            <View style={styles.insightsHeaderLeft}>
+              <Sparkles size={20} color="#8b5cf6" />
+              <Text style={styles.insightsTitle}>Insights Gerados por IA</Text>
+            </View>
+            <TouchableOpacity 
+              style={styles.refreshButton}
+              onPress={generateAIInsights}
+              disabled={isGeneratingInsights}
+            >
+              <Text style={styles.refreshButtonText}>
+                {isGeneratingInsights ? "Gerando..." : "Atualizar"}
+              </Text>
+            </TouchableOpacity>
+          </View>
           
-          <View style={styles.insightItem}>
-            <View style={[styles.insightBullet, { backgroundColor: "#10b981" }]} />
-            <Text style={styles.insightText}>
-              O engajamento aumentou 18% nas últimas duas semanas
-            </Text>
-          </View>
-
-          <View style={styles.insightItem}>
-            <View style={[styles.insightBullet, { backgroundColor: "#f59e0b" }]} />
-            <Text style={styles.insightText}>
-              Eventos aos fins de semana têm 35% mais participação
-            </Text>
-          </View>
-
-          <View style={styles.insightItem}>
-            <View style={[styles.insightBullet, { backgroundColor: "#2563eb" }]} />
-            <Text style={styles.insightText}>
-              Posts sobre educação geram 2x mais interações
-            </Text>
-          </View>
-
-          <View style={styles.insightItem}>
-            <View style={[styles.insightBullet, { backgroundColor: "#8b5cf6" }]} />
-            <Text style={styles.insightText}>
-              O melhor horário para publicar é entre 18h e 20h
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.tipCard}>
-          <Text style={styles.tipTitle}>Recomendação</Text>
-          <Text style={styles.tipText}>
-            Continue focando em conteúdo sobre educação e programe mais eventos para 
-            fins de semana para maximizar o engajamento com a sua base eleitoral.
-          </Text>
+          {aiInsights.length > 0 ? (
+            aiInsights.map((insight, index) => {
+              const colors = ["#10b981", "#f59e0b", "#2563eb", "#8b5cf6"];
+              return (
+                <View key={index} style={styles.insightItem}>
+                  <View style={[styles.insightBullet, { backgroundColor: colors[index % colors.length] }]} />
+                  <Text style={styles.insightText}>{insight}</Text>
+                </View>
+              );
+            })
+          ) : (
+            <Text style={styles.loadingText}>A gerar insights...</Text>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -384,5 +437,35 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
     color: "#6b21a8",
+  },
+  insightsHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  insightsHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  refreshButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: "#f3e8ff",
+    borderWidth: 1,
+    borderColor: "#d8b4fe",
+  },
+  refreshButtonText: {
+    fontSize: 12,
+    fontWeight: "600" as const,
+    color: "#8b5cf6",
+  },
+  loadingText: {
+    fontSize: 14,
+    color: "#6b7280",
+    textAlign: "center",
+    paddingVertical: 20,
   },
 });

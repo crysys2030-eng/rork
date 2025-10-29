@@ -6,11 +6,13 @@ import {
   TouchableOpacity, 
   TextInput, 
   Modal, 
-  Alert 
+  Alert,
+  ActivityIndicator 
 } from "react-native";
 import { Stack } from "expo-router";
-import { Target, Search, Plus, X, Calendar, Users, TrendingUp, Trash2 } from "lucide-react-native";
+import { Target, Search, Plus, X, Calendar, Users, TrendingUp, Trash2, Sparkles } from "lucide-react-native";
 import React, { useState } from "react";
+import { generateText } from "@rork/toolkit-sdk";
 
 type Campaign = {
   id: string;
@@ -76,6 +78,55 @@ export default function CampaignsScreen() {
     budget: "",
     targetAudience: "",
   });
+
+  const [isGeneratingStrategy, setIsGeneratingStrategy] = useState<boolean>(false);
+
+  const generateCampaignStrategy = async () => {
+    if (!newCampaign.name.trim()) {
+      Alert.alert("Erro", "Por favor, insira um nome para a campanha primeiro.");
+      return;
+    }
+
+    setIsGeneratingStrategy(true);
+    try {
+      console.log("Gerando estratégia de campanha com AI...");
+      
+      const strategy = await generateText({
+        messages: [
+          { 
+            role: "user", 
+            content: `Você é um estrategista político experiente. Crie uma estratégia detalhada para a seguinte campanha: "${newCampaign.name}"
+
+Retorne APENAS um JSON válido (sem markdown) com esta estrutura:
+{
+  "description": "descrição detalhada da estratégia (100-150 palavras)",
+  "targetAudience": "público-alvo específico",
+  "budget": "orçamento sugerido em euros"
+}
+
+A estratégia deve ser profissional, realista e adaptada ao contexto político português.` 
+          }
+        ]
+      });
+      
+      const cleanJson = strategy.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const parsedStrategy = JSON.parse(cleanJson);
+      
+      setNewCampaign({
+        ...newCampaign,
+        description: parsedStrategy.description,
+        targetAudience: parsedStrategy.targetAudience,
+        budget: parsedStrategy.budget,
+      });
+      
+      Alert.alert("Sucesso", "Estratégia gerada com AI! Revise e ajuste conforme necessário.");
+    } catch (error) {
+      console.error("Erro ao gerar estratégia:", error);
+      Alert.alert("Erro", "Não foi possível gerar a estratégia. Tente preencher manualmente.");
+    } finally {
+      setIsGeneratingStrategy(false);
+    }
+  };
 
   const addCampaign = () => {
     if (!newCampaign.name || !newCampaign.startDate || !newCampaign.endDate) {
@@ -261,6 +312,21 @@ export default function CampaignsScreen() {
                 onChangeText={(text) => setNewCampaign({ ...newCampaign, name: text })}
                 placeholderTextColor="#9ca3af"
               />
+
+              <TouchableOpacity 
+                style={[styles.aiGenerateButton, isGeneratingStrategy && styles.aiGenerateButtonDisabled]}
+                onPress={generateCampaignStrategy}
+                disabled={isGeneratingStrategy || !newCampaign.name.trim()}
+              >
+                {isGeneratingStrategy ? (
+                  <ActivityIndicator size="small" color="#8b5cf6" />
+                ) : (
+                  <>
+                    <Sparkles size={16} color="#8b5cf6" />
+                    <Text style={styles.aiGenerateButtonText}>Gerar Estratégia com IA</Text>
+                  </>
+                )}
+              </TouchableOpacity>
 
               <Text style={styles.inputLabel}>Descrição</Text>
               <TextInput
@@ -587,5 +653,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#ffffff",
+  },
+  aiGenerateButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "#f3e8ff",
+    borderRadius: 12,
+    paddingVertical: 12,
+    marginTop: 8,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#d8b4fe",
+  },
+  aiGenerateButtonDisabled: {
+    opacity: 0.6,
+  },
+  aiGenerateButtonText: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "#8b5cf6",
   },
 });

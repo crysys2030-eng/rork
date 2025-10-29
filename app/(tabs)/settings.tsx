@@ -148,7 +148,7 @@ export default function SettingsScreen() {
 
         <View style={styles.footer}>
           <Text style={styles.version}>Versão 1.0.0</Text>
-          <Text style={styles.copyright}>{"\u00A9"} 2024 Gestão de Campanha. Todos os direitos reservados.</Text>
+          <Text style={styles.copyright}>© 2024 Gestão de Campanha Todos os direitos reservados</Text>
         </View>
       </ScrollView>
     </View>

@@ -220,6 +220,8 @@ export default function ContactsScreen() {
                   <TouchableOpacity 
                     style={styles.deleteButton}
                     onPress={() => deleteContact(contact.id)}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
                     <Trash2 size={16} color="#dc2626" />
                   </TouchableOpacity>

@@ -348,9 +348,13 @@ export default function ContentScreen() {
                 <TouchableOpacity 
                   style={styles.savedDeleteButton}
                   onPress={(e) => {
-                    e.stopPropagation();
+                    if (e && e.stopPropagation) {
+                      e.stopPropagation();
+                    }
                     deleteSavedContent(saved.id);
                   }}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <Trash2 size={18} color="#dc2626" />
                 </TouchableOpacity>

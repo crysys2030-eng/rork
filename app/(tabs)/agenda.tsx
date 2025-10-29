@@ -166,6 +166,8 @@ export default function AgendaScreen() {
                   <TouchableOpacity 
                     style={styles.deleteButton}
                     onPress={() => deleteEvent(event.id)}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                   >
                     <Trash2 size={18} color="#dc2626" />
                   </TouchableOpacity>

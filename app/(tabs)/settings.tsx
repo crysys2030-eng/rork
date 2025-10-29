@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Switch } from "react-native";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Switch, Alert, Linking } from "react-native";
 import { Stack } from "expo-router";
 import { 
   User, 
@@ -8,7 +8,11 @@ import {
   Info,
   ChevronRight,
   Mail,
-  LucideIcon
+  LucideIcon,
+  Palette,
+  Globe,
+  LogOut,
+  Trash2
 } from "lucide-react-native";
 import React, { useState } from "react";
 
@@ -31,6 +35,126 @@ type SettingItem = SettingItemButton | SettingItemSwitch;
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState<boolean>(true);
   const [emailAlerts, setEmailAlerts] = useState<boolean>(false);
+  const [darkMode, setDarkMode] = useState<boolean>(false);
+
+  const handleNotificationToggle = (value: boolean) => {
+    setNotifications(value);
+    console.log("Notificações Push:", value ? "Ativadas" : "Desativadas");
+  };
+
+  const handleEmailAlertsToggle = (value: boolean) => {
+    setEmailAlerts(value);
+    console.log("Alertas por Email:", value ? "Ativados" : "Desativados");
+  };
+
+  const handleDarkModeToggle = (value: boolean) => {
+    setDarkMode(value);
+    console.log("Modo Escuro:", value ? "Ativado" : "Desativado");
+  };
+
+  const handleProfilePress = () => {
+    Alert.alert(
+      "Perfil",
+      "Visualizar e editar informações do perfil",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Ver Perfil", onPress: () => console.log("Abrindo perfil...") }
+      ]
+    );
+  };
+
+  const handleEmailPress = () => {
+    Alert.alert(
+      "Email e Notificações",
+      "Configurar preferências de email e notificações",
+      [
+        { text: "OK" }
+      ]
+    );
+  };
+
+  const handleHelpPress = () => {
+    Alert.alert(
+      "Ajuda e FAQ",
+      "Precisa de ajuda? Visite nossa central de suporte.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { 
+          text: "Visitar Suporte", 
+          onPress: () => {
+            Linking.openURL("https://support.exemplo.com").catch(() => {
+              Alert.alert("Erro", "Não foi possível abrir o link");
+            });
+          }
+        }
+      ]
+    );
+  };
+
+  const handlePrivacyPress = () => {
+    Alert.alert(
+      "Privacidade e Segurança",
+      "Gerencie suas configurações de privacidade e segurança",
+      [
+        { text: "OK" }
+      ]
+    );
+  };
+
+  const handleAboutPress = () => {
+    Alert.alert(
+      "Sobre",
+      "Gestão de Campanha\nVersão 1.0.0\n\nDesenvolvido para otimizar suas campanhas políticas.",
+      [
+        { text: "OK" }
+      ]
+    );
+  };
+
+  const handleLanguagePress = () => {
+    Alert.alert(
+      "Idioma",
+      "Escolha o idioma da aplicação",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Português", onPress: () => console.log("Português selecionado") },
+        { text: "English", onPress: () => console.log("English selecionado") }
+      ]
+    );
+  };
+
+  const handleClearCachePress = () => {
+    Alert.alert(
+      "Limpar Cache",
+      "Tem certeza que deseja limpar o cache da aplicação? Isso pode melhorar o desempenho.",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { 
+          text: "Limpar", 
+          style: "destructive",
+          onPress: () => {
+            console.log("Cache limpo com sucesso");
+            Alert.alert("Sucesso", "Cache limpo com sucesso!");
+          }
+        }
+      ]
+    );
+  };
+
+  const handleLogoutPress = () => {
+    Alert.alert(
+      "Terminar Sessão",
+      "Tem certeza que deseja sair da aplicação?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { 
+          text: "Sair", 
+          style: "destructive",
+          onPress: () => console.log("Utilizador desconectado")
+        }
+      ]
+    );
+  };
 
   const settingsSections: { title: string; items: SettingItem[] }[] = [
     {
@@ -39,12 +163,12 @@ export default function SettingsScreen() {
         {
           icon: User,
           label: "Perfil",
-          onPress: () => console.log("Profile pressed"),
+          onPress: handleProfilePress,
         },
         {
           icon: Mail,
           label: "Email e Notificações",
-          onPress: () => console.log("Email pressed"),
+          onPress: handleEmailPress,
         },
       ],
     },
@@ -56,14 +180,26 @@ export default function SettingsScreen() {
           label: "Notificações Push",
           type: "switch" as const,
           value: notifications,
-          onValueChange: setNotifications,
+          onValueChange: handleNotificationToggle,
         },
         {
           icon: Mail,
           label: "Alertas por Email",
           type: "switch" as const,
           value: emailAlerts,
-          onValueChange: setEmailAlerts,
+          onValueChange: handleEmailAlertsToggle,
+        },
+        {
+          icon: Palette,
+          label: "Modo Escuro",
+          type: "switch" as const,
+          value: darkMode,
+          onValueChange: handleDarkModeToggle,
+        },
+        {
+          icon: Globe,
+          label: "Idioma",
+          onPress: handleLanguagePress,
         },
       ],
     },
@@ -73,17 +209,32 @@ export default function SettingsScreen() {
         {
           icon: HelpCircle,
           label: "Ajuda e FAQ",
-          onPress: () => console.log("Help pressed"),
+          onPress: handleHelpPress,
         },
         {
           icon: Shield,
           label: "Privacidade e Segurança",
-          onPress: () => console.log("Privacy pressed"),
+          onPress: handlePrivacyPress,
         },
         {
           icon: Info,
           label: "Sobre",
-          onPress: () => console.log("About pressed"),
+          onPress: handleAboutPress,
+        },
+      ],
+    },
+    {
+      title: "Avançado",
+      items: [
+        {
+          icon: Trash2,
+          label: "Limpar Cache",
+          onPress: handleClearCachePress,
+        },
+        {
+          icon: LogOut,
+          label: "Terminar Sessão",
+          onPress: handleLogoutPress,
         },
       ],
     },
@@ -148,7 +299,8 @@ export default function SettingsScreen() {
 
         <View style={styles.footer}>
           <Text style={styles.version}>Versão 1.0.0</Text>
-          <Text style={styles.copyright}>© 2024 Gestão de Campanha. Todos os direitos reservados</Text>
+          <Text style={styles.copyright}>© 2024 Gestão de Campanha</Text>
+          <Text style={styles.copyright}>Todos os direitos reservados</Text>
         </View>
       </ScrollView>
     </View>

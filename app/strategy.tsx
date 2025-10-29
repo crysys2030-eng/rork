@@ -208,7 +208,7 @@ A estratégia deve ser específica, acionável e adaptada ao contexto político 
               </View>
               {strategy.keyActions.map((action, index) => (
                 <View key={index} style={styles.listItem}>
-                  <Text style={styles.listNumber}>{index + 1}.</Text>
+                  <Text style={styles.listNumber}>{index + 1}{'.'}</Text>
                   <Text style={styles.listText}>{action}</Text>
                 </View>
               ))}

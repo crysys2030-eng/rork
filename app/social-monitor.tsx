@@ -211,7 +211,7 @@ O relatório deve ser realista, baseado no contexto político português e inclu
               </View>
               {report.recommendations.map((rec, index) => (
                 <View key={index} style={styles.listItem}>
-                  <Text style={styles.listNumber}>{index + 1}.</Text>
+                  <Text style={styles.listNumber}>{index + 1}{'.'}</Text>
                   <Text style={styles.listText}>{rec}</Text>
                 </View>
               ))}

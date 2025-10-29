@@ -89,6 +89,7 @@ export default function ContactsScreen() {
   };
 
   const deleteContact = (id: string) => {
+    console.log("Attempting to delete contact with id:", id);
     Alert.alert(
       "Confirmar Eliminação",
       "Tem a certeza que deseja eliminar este contato?",
@@ -98,7 +99,10 @@ export default function ContactsScreen() {
           text: "Eliminar",
           style: "destructive",
           onPress: () => {
-            setContacts(contacts.filter((c) => c.id !== id));
+            console.log("Deleting contact", id);
+            const updatedContacts = contacts.filter((c) => c.id !== id);
+            setContacts(updatedContacts);
+            console.log("Contact deleted, remaining contacts:", updatedContacts.length);
             Alert.alert("Sucesso", "Contato eliminado com sucesso!");
           },
         },

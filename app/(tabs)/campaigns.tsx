@@ -103,6 +103,7 @@ export default function CampaignsScreen() {
   };
 
   const deleteCampaign = (id: string) => {
+    console.log("Attempting to delete campaign with id:", id);
     Alert.alert(
       "Confirmar Eliminação",
       "Tem a certeza que deseja eliminar esta campanha?",
@@ -112,7 +113,10 @@ export default function CampaignsScreen() {
           text: "Eliminar",
           style: "destructive",
           onPress: () => {
-            setCampaigns(campaigns.filter((c) => c.id !== id));
+            console.log("Deleting campaign", id);
+            const updatedCampaigns = campaigns.filter((c) => c.id !== id);
+            setCampaigns(updatedCampaigns);
+            console.log("Campaign deleted, remaining campaigns:", updatedCampaigns.length);
             Alert.alert("Sucesso", "Campanha eliminada com sucesso!");
           },
         },

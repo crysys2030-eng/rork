@@ -80,6 +80,7 @@ export default function AgendaScreen() {
   };
 
   const deleteEvent = (id: string) => {
+    console.log("Attempting to delete event with id:", id);
     Alert.alert(
       "Confirmar Eliminação",
       "Tem a certeza que deseja eliminar este evento?",
@@ -89,7 +90,10 @@ export default function AgendaScreen() {
           text: "Eliminar",
           style: "destructive",
           onPress: () => {
-            setEvents(events.filter((e) => e.id !== id));
+            console.log("Deleting event", id);
+            const updatedEvents = events.filter((e) => e.id !== id);
+            setEvents(updatedEvents);
+            console.log("Event deleted, remaining events:", updatedEvents.length);
             Alert.alert("Sucesso", "Evento eliminado com sucesso!");
           },
         },

@@ -1,9 +1,36 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from "react-native";
-import { Stack } from "expo-router";
-import { TrendingUp, Users, Calendar, Target } from "lucide-react-native";
-import React from "react";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal, TextInput, Alert } from "react-native";
+import { Stack, useRouter } from "expo-router";
+import { TrendingUp, Users, Calendar, Target, X } from "lucide-react-native";
+import React, { useState } from "react";
 
 export default function DashboardScreen() {
+  const router = useRouter();
+  const [showCampaignModal, setShowCampaignModal] = useState<boolean>(false);
+  const [campaignName, setCampaignName] = useState<string>("");
+
+  const handleNewContact = () => {
+    router.push("/(tabs)/contacts");
+  };
+
+  const handleNewEvent = () => {
+    router.push("/(tabs)/agenda");
+  };
+
+  const handleNewCampaign = () => {
+    setShowCampaignModal(true);
+  };
+
+  const createCampaign = () => {
+    if (!campaignName.trim()) {
+      Alert.alert("Erro", "Por favor, insira um nome para a campanha.");
+      return;
+    }
+
+    Alert.alert("Sucesso", `Campanha "${campaignName}" criada com sucesso!`);
+    setShowCampaignModal(false);
+    setCampaignName("");
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ title: "Dashboard" }} />
@@ -67,21 +94,62 @@ export default function DashboardScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ações Rápidas</Text>
           <View style={styles.actionsGrid}>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleNewContact}>
               <Users size={20} color="#2563eb" />
               <Text style={styles.actionButtonText}>Novo Contato</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleNewEvent}>
               <Calendar size={20} color="#2563eb" />
               <Text style={styles.actionButtonText}>Criar Evento</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleNewCampaign}>
               <Target size={20} color="#2563eb" />
               <Text style={styles.actionButtonText}>Nova Campanha</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showCampaignModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowCampaignModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Nova Campanha</Text>
+              <TouchableOpacity onPress={() => setShowCampaignModal(false)}>
+                <X size={24} color="#6b7280" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <Text style={styles.inputLabel}>Nome da Campanha</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ex: Campanha Autárquicas 2025"
+                value={campaignName}
+                onChangeText={setCampaignName}
+                placeholderTextColor="#9ca3af"
+              />
+            </View>
+
+            <View style={styles.modalFooter}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowCampaignModal(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.saveButton} onPress={createCampaign}>
+                <Text style={styles.saveButtonText}>Criar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -234,5 +302,80 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: "#2563eb",
     textAlign: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    width: "100%",
+    maxWidth: 400,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: "#111827",
+  },
+  modalBody: {
+    padding: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "#374151",
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: "#f9fafb",
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+    color: "#111827",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  modalFooter: {
+    flexDirection: "row",
+    padding: 20,
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#f3f4f6",
+    alignItems: "center",
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: "#6b7280",
+  },
+  saveButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#2563eb",
+    alignItems: "center",
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: "#ffffff",
   },
 });

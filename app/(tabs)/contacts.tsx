@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput } from "react-native";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from "react-native";
 import { Stack } from "expo-router";
-import { Users, Search, Plus, Phone, Mail, MapPin } from "lucide-react-native";
+import { Users, Search, Plus, Phone, Mail, MapPin, Trash2, X } from "lucide-react-native";
 import React, { useState } from "react";
 
 type Contact = {
@@ -15,8 +15,8 @@ type Contact = {
 export default function ContactsScreen() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
-
-  const contacts: Contact[] = [
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [contacts, setContacts] = useState<Contact[]>([
     {
       id: "1",
       name: "João Silva",
@@ -49,7 +49,62 @@ export default function ContactsScreen() {
       location: "Braga",
       level: "supporter",
     },
-  ];
+  ]);
+
+  const [newContact, setNewContact] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    location: string;
+    level: "supporter" | "volunteer" | "donor" | "leader";
+  }>({
+    name: "",
+    email: "",
+    phone: "",
+    location: "",
+    level: "supporter",
+  });
+
+  const addContact = () => {
+    if (!newContact.name || !newContact.email || !newContact.phone) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    const contact: Contact = {
+      id: Date.now().toString(),
+      ...newContact,
+    };
+
+    setContacts([...contacts, contact]);
+    setShowAddModal(false);
+    setNewContact({
+      name: "",
+      email: "",
+      phone: "",
+      location: "",
+      level: "supporter",
+    });
+    Alert.alert("Sucesso", "Contato adicionado com sucesso!");
+  };
+
+  const deleteContact = (id: string) => {
+    Alert.alert(
+      "Confirmar Eliminação",
+      "Tem a certeza que deseja eliminar este contato?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => {
+            setContacts(contacts.filter((c) => c.id !== id));
+            Alert.alert("Sucesso", "Contato eliminado com sucesso!");
+          },
+        },
+      ]
+    );
+  };
 
   const filters = [
     { id: "all", label: "Todos" },
@@ -109,7 +164,7 @@ export default function ContactsScreen() {
           />
         </View>
         
-        <TouchableOpacity style={styles.addButton}>
+        <TouchableOpacity style={styles.addButton} onPress={() => setShowAddModal(true)}>
           <Plus size={24} color="#ffffff" />
         </TouchableOpacity>
       </View>
@@ -143,7 +198,7 @@ export default function ContactsScreen() {
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {filteredContacts.map((contact) => (
-          <TouchableOpacity key={contact.id} style={styles.contactCard}>
+          <View key={contact.id} style={styles.contactCard}>
             <View style={[styles.contactAvatar, { backgroundColor: getLevelColor(contact.level) + "20" }]}>
               <Users size={24} color={getLevelColor(contact.level)} />
             </View>
@@ -175,9 +230,115 @@ export default function ContactsScreen() {
                 </View>
               </View>
             </View>
-          </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => deleteContact(contact.id)}
+            >
+              <Trash2 size={20} color="#dc2626" />
+            </TouchableOpacity>
+          </View>
         ))}
       </ScrollView>
+
+      <Modal
+        visible={showAddModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowAddModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Novo Contato</Text>
+              <TouchableOpacity onPress={() => setShowAddModal(false)}>
+                <X size={24} color="#6b7280" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.modalBody}>
+              <Text style={styles.inputLabel}>Nome *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Nome completo"
+                value={newContact.name}
+                onChangeText={(text) => setNewContact({ ...newContact, name: text })}
+                placeholderTextColor="#9ca3af"
+              />
+
+              <Text style={styles.inputLabel}>Email *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="email@exemplo.com"
+                value={newContact.email}
+                onChangeText={(text) => setNewContact({ ...newContact, email: text })}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                placeholderTextColor="#9ca3af"
+              />
+
+              <Text style={styles.inputLabel}>Telefone *</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="+351 912 345 678"
+                value={newContact.phone}
+                onChangeText={(text) => setNewContact({ ...newContact, phone: text })}
+                keyboardType="phone-pad"
+                placeholderTextColor="#9ca3af"
+              />
+
+              <Text style={styles.inputLabel}>Localização</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Cidade"
+                value={newContact.location}
+                onChangeText={(text) => setNewContact({ ...newContact, location: text })}
+                placeholderTextColor="#9ca3af"
+              />
+
+              <Text style={styles.inputLabel}>Nível</Text>
+              <View style={styles.levelButtons}>
+                {[
+                  { value: "supporter" as const, label: "Apoiador" },
+                  { value: "volunteer" as const, label: "Voluntário" },
+                  { value: "donor" as const, label: "Doador" },
+                  { value: "leader" as const, label: "Líder" },
+                ].map((level) => (
+                  <TouchableOpacity
+                    key={level.value}
+                    style={[
+                      styles.levelButton,
+                      newContact.level === level.value && styles.levelButtonActive,
+                    ]}
+                    onPress={() => setNewContact({ ...newContact, level: level.value })}
+                  >
+                    <Text
+                      style={[
+                        styles.levelButtonText,
+                        newContact.level === level.value && styles.levelButtonTextActive,
+                      ]}
+                    >
+                      {level.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+
+            <View style={styles.modalFooter}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowAddModal(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.saveButton} onPress={addContact}>
+                <Text style={styles.saveButtonText}>Adicionar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -306,5 +467,108 @@ const styles = StyleSheet.create({
   contactDetailText: {
     fontSize: 13,
     color: "#6b7280",
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "flex-end",
+  },
+  modalContent: {
+    backgroundColor: "#ffffff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "90%",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700" as const,
+    color: "#111827",
+  },
+  modalBody: {
+    padding: 20,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "#374151",
+    marginBottom: 8,
+    marginTop: 12,
+  },
+  input: {
+    backgroundColor: "#f9fafb",
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+    color: "#111827",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  levelButtons: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  levelButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: "#f3f4f6",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  levelButtonActive: {
+    backgroundColor: "#eff6ff",
+    borderColor: "#2563eb",
+  },
+  levelButtonText: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "#6b7280",
+  },
+  levelButtonTextActive: {
+    color: "#2563eb",
+  },
+  modalFooter: {
+    flexDirection: "row",
+    padding: 20,
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#f3f4f6",
+    alignItems: "center",
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: "#6b7280",
+  },
+  saveButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#2563eb",
+    alignItems: "center",
+  },
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: "600" as const,
+    color: "#ffffff",
   },
 });

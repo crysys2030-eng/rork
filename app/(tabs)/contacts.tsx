@@ -469,8 +469,11 @@ const styles = StyleSheet.create({
     color: "#6b7280",
   },
   deleteButton: {
-    padding: 8,
-    marginLeft: 8,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
   },
   modalOverlay: {
     flex: 1,

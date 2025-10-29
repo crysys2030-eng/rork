@@ -10,7 +10,7 @@ import {
   Platform 
 } from "react-native";
 import { Stack } from "expo-router";
-import { Sparkles, FileText, Share2, Copy, Download } from "lucide-react-native";
+import { Sparkles, FileText, Share2, Copy, Download, Trash2, Save } from "lucide-react-native";
 import React, { useState } from "react";
 import { generateText } from "@rork/toolkit-sdk";
 import * as Print from "expo-print";
@@ -19,11 +19,20 @@ import * as Clipboard from "expo-clipboard";
 
 type ContentType = "speech" | "social" | "response" | "analysis";
 
+type SavedContent = {
+  id: string;
+  type: ContentType;
+  prompt: string;
+  content: string;
+  date: string;
+};
+
 export default function ContentScreen() {
   const [selectedType, setSelectedType] = useState<ContentType>("speech");
   const [prompt, setPrompt] = useState<string>("");
   const [generatedContent, setGeneratedContent] = useState<string>("");
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [savedContents, setSavedContents] = useState<SavedContent[]>([]);
 
   const contentTypes = [
     { id: "speech" as ContentType, label: "Discurso", icon: FileText },
@@ -66,6 +75,48 @@ export default function ContentScreen() {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const saveContent = () => {
+    if (!generatedContent) return;
+    
+    const newSavedContent: SavedContent = {
+      id: Date.now().toString(),
+      type: selectedType,
+      prompt: prompt,
+      content: generatedContent,
+      date: new Date().toISOString(),
+    };
+    
+    setSavedContents([newSavedContent, ...savedContents]);
+    Alert.alert("Sucesso", "Conteúdo guardado com sucesso!");
+  };
+
+  const deleteSavedContent = (id: string) => {
+    Alert.alert(
+      "Eliminar Conteúdo",
+      "Tem certeza que deseja eliminar este conteúdo?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => {
+            setSavedContents(savedContents.filter(c => c.id !== id));
+            Alert.alert("Sucesso", "Conteúdo eliminado com sucesso!");
+          },
+        },
+      ]
+    );
+  };
+
+  const loadContent = (saved: SavedContent) => {
+    setSelectedType(saved.type);
+    setPrompt(saved.prompt);
+    setGeneratedContent(saved.content);
   };
 
   const copyToClipboard = async () => {
@@ -248,6 +299,10 @@ export default function ContentScreen() {
             <View style={styles.resultHeader}>
               <Text style={styles.resultTitle}>Conteúdo Gerado</Text>
               <View style={styles.actionButtons}>
+                <TouchableOpacity style={styles.actionButton} onPress={saveContent}>
+                  <Save size={16} color="#f59e0b" />
+                  <Text style={[styles.actionButtonText, { color: "#f59e0b" }]}>Guardar</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.actionButton} onPress={copyToClipboard}>
                   <Copy size={16} color="#2563eb" />
                   <Text style={styles.actionButtonText}>Copiar</Text>
@@ -262,6 +317,45 @@ export default function ContentScreen() {
             <View style={styles.resultContent}>
               <Text style={styles.resultText}>{generatedContent}</Text>
             </View>
+          </View>
+        )}
+
+        {savedContents.length > 0 && (
+          <View style={styles.savedSection}>
+            <Text style={styles.savedTitle}>Conteúdos Guardados</Text>
+            {savedContents.map((saved) => (
+              <TouchableOpacity 
+                key={saved.id} 
+                style={styles.savedCard}
+                onPress={() => loadContent(saved)}
+              >
+                <View style={styles.savedCardContent}>
+                  <View style={styles.savedCardHeader}>
+                    <Text style={styles.savedCardType}>{getContentTypeTitle()}</Text>
+                    <Text style={styles.savedCardDate}>
+                      {new Date(saved.date).toLocaleDateString("pt-PT", {
+                        day: "numeric",
+                        month: "short",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Text>
+                  </View>
+                  <Text style={styles.savedCardPrompt} numberOfLines={2}>
+                    {saved.prompt}
+                  </Text>
+                </View>
+                <TouchableOpacity 
+                  style={styles.savedDeleteButton}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    deleteSavedContent(saved.id);
+                  }}
+                >
+                  <Trash2 size={18} color="#dc2626" />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            ))}
           </View>
         )}
 
@@ -429,5 +523,56 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
     color: "#78350f",
+  },
+  savedSection: {
+    marginBottom: 24,
+  },
+  savedTitle: {
+    fontSize: 18,
+    fontWeight: "700" as const,
+    color: "#111827",
+    marginBottom: 16,
+  },
+  savedCard: {
+    flexDirection: "row",
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    alignItems: "center",
+  },
+  savedCardContent: {
+    flex: 1,
+  },
+  savedCardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  savedCardType: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "#2563eb",
+  },
+  savedCardDate: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
+  savedCardPrompt: {
+    fontSize: 14,
+    color: "#374151",
+    lineHeight: 20,
+  },
+  savedDeleteButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: "#fee2e2",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
   },
 });

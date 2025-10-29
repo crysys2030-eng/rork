@@ -266,7 +266,7 @@ export default function ContentScreen() {
         )}
 
         <View style={styles.tipCard}>
-          <Text style={styles.tipTitle}>💡 Dica</Text>
+          <Text style={styles.tipTitle}>Dica</Text>
           <Text style={styles.tipText}>
             Seja específico na sua solicitação. Inclua o tema principal, 
             o público-alvo e o tom desejado para obter melhores resultados.

@@ -469,8 +469,8 @@ const styles = StyleSheet.create({
     color: "#6b7280",
   },
   deleteButton: {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     alignItems: "center" as const,
     justifyContent: "center" as const,
     alignSelf: "center" as const,

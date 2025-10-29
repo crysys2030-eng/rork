@@ -1,6 +1,18 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Modal, TextInput, Alert } from "react-native";
 import { Stack, useRouter } from "expo-router";
-import { TrendingUp, Users, Calendar, Target, X } from "lucide-react-native";
+import { 
+  TrendingUp, 
+  Users, 
+  Calendar, 
+  Target, 
+  X, 
+  MessageSquare,
+  Lightbulb,
+  BarChart3,
+  BookOpen,
+  Sparkles,
+  MessageCircle
+} from "lucide-react-native";
 import React, { useState } from "react";
 
 export default function DashboardScreen() {
@@ -18,6 +30,50 @@ export default function DashboardScreen() {
 
   const handleNewCampaign = () => {
     setShowCampaignModal(true);
+  };
+
+  const handleSentimentAnalysis = () => {
+    Alert.alert(
+      "Análise de Sentimento",
+      "Ferramenta disponível em breve para analisar o sentimento dos eleitores nas redes sociais e feedback.",
+      [{ text: "OK" }]
+    );
+  };
+
+  const handleSloganGenerator = () => {
+    router.push("/(tabs)/content");
+  };
+
+  const handleDebateAssistant = () => {
+    Alert.alert(
+      "Assistente de Debate",
+      "Prepare-se para debates com argumentos, respostas e pontos-chave organizados por tópico.",
+      [{ text: "OK" }]
+    );
+  };
+
+  const handleDataAnalysis = () => {
+    Alert.alert(
+      "Análise de Dados",
+      "Visualize métricas da campanha, tendências e insights baseados em dados coletados.",
+      [{ text: "OK" }]
+    );
+  };
+
+  const handleStrategyCreator = () => {
+    Alert.alert(
+      "Criador de Estratégias",
+      "Planeje estratégias personalizadas com base no público-alvo, orçamento e objetivos da campanha.",
+      [{ text: "OK" }]
+    );
+  };
+
+  const handleSocialMonitor = () => {
+    Alert.alert(
+      "Monitor de Redes Sociais",
+      "Acompanhe menções, hashtags e tendências relacionadas à sua campanha em tempo real.",
+      [{ text: "OK" }]
+    );
   };
 
   const createCampaign = () => {
@@ -105,6 +161,59 @@ export default function DashboardScreen() {
             <TouchableOpacity style={styles.actionButton} onPress={handleNewCampaign}>
               <Target size={20} color="#2563eb" />
               <Text style={styles.actionButtonText}>Nova Campanha</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Ferramentas com IA</Text>
+          <View style={styles.toolsGrid}>
+            <TouchableOpacity style={styles.toolCard} onPress={handleSloganGenerator}>
+              <View style={[styles.toolIcon, { backgroundColor: "#eff6ff" }]}>
+                <Sparkles size={24} color="#2563eb" />
+              </View>
+              <Text style={styles.toolTitle}>Gerador de Conteúdo</Text>
+              <Text style={styles.toolDescription}>Crie discursos e posts</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.toolCard} onPress={handleSentimentAnalysis}>
+              <View style={[styles.toolIcon, { backgroundColor: "#f0fdf4" }]}>
+                <MessageSquare size={24} color="#10b981" />
+              </View>
+              <Text style={styles.toolTitle}>Análise de Sentimento</Text>
+              <Text style={styles.toolDescription}>Sentimento dos eleitores</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.toolCard} onPress={handleDebateAssistant}>
+              <View style={[styles.toolIcon, { backgroundColor: "#fef3c7" }]}>
+                <MessageCircle size={24} color="#f59e0b" />
+              </View>
+              <Text style={styles.toolTitle}>Assistente de Debate</Text>
+              <Text style={styles.toolDescription}>Prepare argumentos</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.toolCard} onPress={handleDataAnalysis}>
+              <View style={[styles.toolIcon, { backgroundColor: "#f3e8ff" }]}>
+                <BarChart3 size={24} color="#8b5cf6" />
+              </View>
+              <Text style={styles.toolTitle}>Análise de Dados</Text>
+              <Text style={styles.toolDescription}>Métricas e insights</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.toolCard} onPress={handleStrategyCreator}>
+              <View style={[styles.toolIcon, { backgroundColor: "#fee2e2" }]}>
+                <Lightbulb size={24} color="#dc2626" />
+              </View>
+              <Text style={styles.toolTitle}>Criador de Estratégias</Text>
+              <Text style={styles.toolDescription}>Planeje campanhas</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.toolCard} onPress={handleSocialMonitor}>
+              <View style={[styles.toolIcon, { backgroundColor: "#dbeafe" }]}>
+                <BookOpen size={24} color="#1d4ed8" />
+              </View>
+              <Text style={styles.toolTitle}>Monitor de Redes</Text>
+              <Text style={styles.toolDescription}>Acompanhe tendências</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -302,6 +411,41 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: "#2563eb",
     textAlign: "center",
+  },
+  toolsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  toolCard: {
+    width: "48%",
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  toolIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+  toolTitle: {
+    fontSize: 14,
+    fontWeight: "700" as const,
+    color: "#111827",
+    marginBottom: 4,
+  },
+  toolDescription: {
+    fontSize: 12,
+    color: "#6b7280",
+    lineHeight: 16,
   },
   modalOverlay: {
     flex: 1,

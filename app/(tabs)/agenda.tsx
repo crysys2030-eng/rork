@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from "react-native";
 import { Stack } from "expo-router";
-import { Calendar, MapPin, Clock, Plus, Search, X } from "lucide-react-native";
+import { Calendar, MapPin, Clock, Plus, Search, X, Trash2 } from "lucide-react-native";
 import React, { useState } from "react";
 
 type Event = {
@@ -79,6 +79,27 @@ export default function AgendaScreen() {
     Alert.alert("Sucesso", "Evento adicionado com sucesso!");
   };
 
+  const deleteEvent = (id: string) => {
+    Alert.alert(
+      "Eliminar Evento",
+      "Tem certeza que deseja eliminar este evento?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => {
+            setEvents(events.filter(e => e.id !== id));
+            Alert.alert("Sucesso", "Evento eliminado com sucesso!");
+          },
+        },
+      ]
+    );
+  };
+
 
 
   const getEventColor = (type: string) => {
@@ -136,10 +157,18 @@ export default function AgendaScreen() {
             <View style={styles.eventContent}>
               <View style={styles.eventHeader}>
                 <Text style={styles.eventTitle}>{event.title}</Text>
-                <View style={[styles.eventTypeBadge, { backgroundColor: getEventColor(event.type) + "20" }]}>
-                  <Text style={[styles.eventTypeText, { color: getEventColor(event.type) }]}>
-                    {getEventTypeLabel(event.type)}
-                  </Text>
+                <View style={styles.eventHeaderRight}>
+                  <View style={[styles.eventTypeBadge, { backgroundColor: getEventColor(event.type) + "20" }]}>
+                    <Text style={[styles.eventTypeText, { color: getEventColor(event.type) }]}>
+                      {getEventTypeLabel(event.type)}
+                    </Text>
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.deleteButton}
+                    onPress={() => deleteEvent(event.id)}
+                  >
+                    <Trash2 size={18} color="#dc2626" />
+                  </TouchableOpacity>
                 </View>
               </View>
               
@@ -336,11 +365,24 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 12,
   },
+  eventHeaderRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   eventTitle: {
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#111827",
     flex: 1,
+  },
+  deleteButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: "#fee2e2",
+    alignItems: "center",
+    justifyContent: "center",
   },
   eventTypeBadge: {
     paddingHorizontal: 8,

@@ -270,7 +270,7 @@ export default function SettingsScreen() {
                       styles.settingItem,
                       itemIndex === section.items.length - 1 && styles.settingItemLast,
                     ]}
-                    onPress={"type" in item && item.type === "switch" ? undefined : "onPress" in item ? item.onPress : undefined}
+                    onPress={"type" in item && item.type === "switch" ? undefined : ("onPress" in item ? item.onPress : undefined)}
                     disabled={"type" in item && item.type === "switch"}
                   >
                     <View style={styles.settingItemLeft}>

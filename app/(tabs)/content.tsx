@@ -5,12 +5,17 @@ import {
   ScrollView, 
   TouchableOpacity, 
   TextInput,
-  ActivityIndicator 
+  ActivityIndicator,
+  Alert,
+  Platform 
 } from "react-native";
 import { Stack } from "expo-router";
-import { Sparkles, FileText, Share2, Copy } from "lucide-react-native";
+import { Sparkles, FileText, Share2, Copy, Download } from "lucide-react-native";
 import React, { useState } from "react";
 import { generateText } from "@rork/toolkit-sdk";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
+import * as Clipboard from "expo-clipboard";
 
 type ContentType = "speech" | "social" | "response" | "analysis";
 
@@ -60,6 +65,98 @@ export default function ContentScreen() {
       setGeneratedContent("Erro ao gerar conteúdo. Por favor, tente novamente.");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    if (!generatedContent) return;
+    
+    try {
+      await Clipboard.setStringAsync(generatedContent);
+      Alert.alert("Sucesso", "Conteúdo copiado para a área de transferência!");
+    } catch (error) {
+      console.error("Error copying to clipboard:", error);
+      Alert.alert("Erro", "Não foi possível copiar o conteúdo.");
+    }
+  };
+
+  const generatePDF = async () => {
+    if (!generatedContent) return;
+    
+    try {
+      const html = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                padding: 40px;
+                line-height: 1.6;
+                color: #333;
+              }
+              h1 {
+                color: #2563eb;
+                margin-bottom: 20px;
+                font-size: 24px;
+              }
+              .content {
+                white-space: pre-wrap;
+                font-size: 14px;
+              }
+              .footer {
+                margin-top: 40px;
+                padding-top: 20px;
+                border-top: 1px solid #e5e7eb;
+                font-size: 12px;
+                color: #6b7280;
+              }
+            </style>
+          </head>
+          <body>
+            <h1>${getContentTypeTitle()}</h1>
+            <div class="content">${generatedContent.replace(/\n/g, '<br>')}</div>
+            <div class="footer">
+              Gerado em ${new Date().toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}
+            </div>
+          </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html });
+      
+      if (Platform.OS === 'web') {
+        const link = document.createElement('a');
+        link.href = uri;
+        link.download = `conteudo-${Date.now()}.pdf`;
+        link.click();
+        Alert.alert("Sucesso", "PDF gerado com sucesso!");
+      } else {
+        const canShare = await Sharing.isAvailableAsync();
+        if (canShare) {
+          await Sharing.shareAsync(uri);
+        } else {
+          Alert.alert("PDF Gerado", `PDF salvo em: ${uri}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      Alert.alert("Erro", "Não foi possível gerar o PDF.");
+    }
+  };
+
+  const getContentTypeTitle = () => {
+    switch (selectedType) {
+      case "speech":
+        return "Discurso Político";
+      case "social":
+        return "Conteúdo para Redes Sociais";
+      case "response":
+        return "Resposta Estratégica";
+      default:
+        return "Conteúdo Gerado";
     }
   };
 
@@ -150,10 +247,16 @@ export default function ContentScreen() {
           <View style={styles.resultSection}>
             <View style={styles.resultHeader}>
               <Text style={styles.resultTitle}>Conteúdo Gerado</Text>
-              <TouchableOpacity style={styles.copyButton}>
-                <Copy size={16} color="#2563eb" />
-                <Text style={styles.copyButtonText}>Copiar</Text>
-              </TouchableOpacity>
+              <View style={styles.actionButtons}>
+                <TouchableOpacity style={styles.actionButton} onPress={copyToClipboard}>
+                  <Copy size={16} color="#2563eb" />
+                  <Text style={styles.actionButtonText}>Copiar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.actionButton} onPress={generatePDF}>
+                  <Download size={16} color="#10b981" />
+                  <Text style={[styles.actionButtonText, { color: "#10b981" }]}>PDF</Text>
+                </TouchableOpacity>
+              </View>
             </View>
             
             <View style={styles.resultContent}>
@@ -279,16 +382,20 @@ const styles = StyleSheet.create({
     fontWeight: "600" as const,
     color: "#111827",
   },
-  copyButton: {
+  actionButtons: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  actionButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: "#eff6ff",
+    backgroundColor: "#f3f4f6",
   },
-  copyButtonText: {
+  actionButtonText: {
     fontSize: 14,
     fontWeight: "600" as const,
     color: "#2563eb",

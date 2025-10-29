@@ -12,7 +12,6 @@ import {
 import { Stack } from "expo-router";
 import { Sparkles, FileText, Share2, Copy, Download, Trash2, Save } from "lucide-react-native";
 import React, { useState } from "react";
-import { generateText } from "@rork/toolkit-sdk";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import * as Clipboard from "expo-clipboard";
@@ -58,22 +57,28 @@ export default function ContentScreen() {
     
     setIsGenerating(true);
     try {
-      const systemPrompt = getSystemPromptForType(selectedType);
-      const result = await generateText({
-        messages: [
-          {
-            role: "user",
-            content: `${systemPrompt}\n\nSolicitação do utilizador: ${prompt}`,
-          },
-        ],
-      });
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      setGeneratedContent(result);
+      const mockContent = getMockContentForType(selectedType, prompt);
+      setGeneratedContent(mockContent);
     } catch (error) {
       console.error("Error generating content:", error);
       setGeneratedContent("Erro ao gerar conteúdo. Por favor, tente novamente.");
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const getMockContentForType = (type: ContentType, userPrompt: string): string => {
+    switch (type) {
+      case "speech":
+        return `Caros concidadãos,\n\nÉ com grande honra que me dirijo a vocês hoje para falar sobre ${userPrompt}.\n\nVivemos tempos de grandes desafios, mas também de grandes oportunidades. É fundamental que trabalhemos juntos para construir um futuro melhor para todos.\n\nAs nossas propostas visam:\n• Melhorar a qualidade de vida dos cidadãos\n• Fortalecer as instituições democráticas\n• Promover o desenvolvimento sustentável\n• Garantir justiça social para todos\n\nConto com o vosso apoio nesta jornada. Juntos, podemos fazer a diferença!\n\nMuito obrigado.`;
+      case "social":
+        return `🎯 ${userPrompt}\n\n✨ É hora de mudança! Nossa proposta visa trazer melhorias concretas para todos os cidadãos.\n\n💪 Juntos somos mais fortes!\n\n#PolíticaPositiva #Mudança #Futuro #Juntos`;
+      case "response":
+        return `Agradecemos a preocupação levantada sobre ${userPrompt}.\n\nÉ importante esclarecer que:\n\n1. Estamos comprometidos com a transparência e o diálogo aberto com todos os cidadãos.\n\n2. As nossas políticas são baseadas em evidências e no melhor interesse da comunidade.\n\n3. Continuaremos a trabalhar incansavelmente para servir o público com dedicação e integridade.\n\nEstamos sempre disponíveis para ouvir sugestões e preocupações. A nossa porta está sempre aberta.`;
+      default:
+        return "Conteúdo gerado com base na sua solicitação.";
     }
   };
 
@@ -211,18 +216,7 @@ export default function ContentScreen() {
     }
   };
 
-  const getSystemPromptForType = (type: ContentType): string => {
-    switch (type) {
-      case "speech":
-        return "Você é um assistente de redação política. Crie um discurso persuasivo e impactante, adequado para campanhas políticas. O discurso deve ter: saudação inicial, enquadramento do problema, apresentação de soluções e apelo à ação. Use linguagem clara e inspiradora.";
-      case "social":
-        return "Você é um especialista em comunicação para redes sociais. Crie uma publicação curta, impactante e otimizada para engajamento. Use linguagem direta e inclua sugestões de hashtags relevantes.";
-      case "response":
-        return "Você é um assessor de comunicação política. Forneça uma resposta estratégica, empática mas firme, que aborde as preocupações levantadas de forma construtiva e apresente as posições políticas de forma clara.";
-      default:
-        return "Você é um assistente de comunicação política. Ajude a criar conteúdo eficaz para campanhas políticas.";
-    }
-  };
+
 
   return (
     <View style={styles.container}>

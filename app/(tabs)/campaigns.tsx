@@ -10,7 +10,7 @@ import {
   ActivityIndicator 
 } from "react-native";
 import { Stack } from "expo-router";
-import { Target, Search, Plus, X, Calendar, Users, TrendingUp, Trash2, Sparkles } from "lucide-react-native";
+import { Target, Search, Plus, X, Calendar, Users, TrendingUp, Sparkles } from "lucide-react-native";
 import React, { useState } from "react";
 import { generateText } from "@rork/toolkit-sdk";
 
@@ -153,28 +153,6 @@ A estratégia deve ser profissional, realista e adaptada ao contexto político p
     Alert.alert("Sucesso", "Campanha criada com sucesso!");
   };
 
-  const deleteCampaign = (id: string) => {
-    Alert.alert(
-      "Eliminar Campanha",
-      "Tem certeza que deseja eliminar esta campanha?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: () => {
-            setCampaigns(campaigns.filter(c => c.id !== id));
-            Alert.alert("Sucesso", "Campanha eliminada com sucesso!");
-          },
-        },
-      ]
-    );
-  };
-
-
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -237,20 +215,10 @@ A estratégia deve ser profissional, realista e adaptada ao contexto político p
                 <Target size={20} color="#2563eb" />
                 <Text style={styles.campaignName}>{campaign.name}</Text>
               </View>
-              <View style={styles.campaignHeaderRight}>
-                <View style={[styles.statusBadge, { backgroundColor: getStatusColor(campaign.status) + "20" }]}>
-                  <Text style={[styles.statusText, { color: getStatusColor(campaign.status) }]}>
-                    {getStatusLabel(campaign.status)}
-                  </Text>
-                </View>
-                <TouchableOpacity 
-                  style={styles.deleteButton}
-                  onPress={() => deleteCampaign(campaign.id)}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <Trash2 size={18} color="#dc2626" />
-                </TouchableOpacity>
+              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(campaign.status) + "20" }]}>
+                <Text style={[styles.statusText, { color: getStatusColor(campaign.status) }]}>
+                  {getStatusLabel(campaign.status)}
+                </Text>
               </View>
             </View>
 
@@ -481,25 +449,14 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     marginBottom: 8,
   },
-  campaignHeaderRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
+
   campaignTitleRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
     flex: 1,
   },
-  deleteButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: "#fee2e2",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+
   campaignName: {
     fontSize: 16,
     fontWeight: "600" as const,

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from "react-native";
 import { Stack } from "expo-router";
-import { Users, Search, Plus, Phone, Mail, MapPin, X, Trash2 } from "lucide-react-native";
+import { Users, Search, Plus, Phone, Mail, MapPin, X } from "lucide-react-native";
 import React, { useState } from "react";
 
 type Contact = {
@@ -87,28 +87,6 @@ export default function ContactsScreen() {
     });
     Alert.alert("Sucesso", "Contato adicionado com sucesso!");
   };
-
-  const deleteContact = (id: string) => {
-    Alert.alert(
-      "Eliminar Contato",
-      "Tem certeza que deseja eliminar este contato?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: () => {
-            setContacts(contacts.filter(c => c.id !== id));
-            Alert.alert("Sucesso", "Contato eliminado com sucesso!");
-          },
-        },
-      ]
-    );
-  };
-
 
 
   const filters = [
@@ -211,20 +189,10 @@ export default function ContactsScreen() {
             <View style={styles.contactContent}>
               <View style={styles.contactHeader}>
                 <Text style={styles.contactName}>{contact.name}</Text>
-                <View style={styles.contactHeaderRight}>
-                  <View style={[styles.levelBadge, { backgroundColor: getLevelColor(contact.level) + "20" }]}>
-                    <Text style={[styles.levelText, { color: getLevelColor(contact.level) }]}>
-                      {getLevelLabel(contact.level)}
-                    </Text>
-                  </View>
-                  <TouchableOpacity 
-                    style={styles.deleteButton}
-                    onPress={() => deleteContact(contact.id)}
-                    activeOpacity={0.7}
-                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  >
-                    <Trash2 size={16} color="#dc2626" />
-                  </TouchableOpacity>
+                <View style={[styles.levelBadge, { backgroundColor: getLevelColor(contact.level) + "20" }]}>
+                  <Text style={[styles.levelText, { color: getLevelColor(contact.level) }]}>
+                    {getLevelLabel(contact.level)}
+                  </Text>
                 </View>
               </View>
               
@@ -449,25 +417,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 8,
   },
-  contactHeaderRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
+
   contactName: {
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#111827",
     flex: 1,
   },
-  deleteButton: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
-    backgroundColor: "#fee2e2",
-    alignItems: "center",
-    justifyContent: "center",
-  },
+
   levelBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,

@@ -10,7 +10,7 @@ import {
   Platform 
 } from "react-native";
 import { Stack } from "expo-router";
-import { Sparkles, FileText, Share2, Copy, Download, Trash2, Save } from "lucide-react-native";
+import { Sparkles, FileText, Share2, Copy, Download, Save } from "lucide-react-native";
 import React, { useState } from "react";
 import { generateText } from "@rork/toolkit-sdk";
 import * as Print from "expo-print";
@@ -106,29 +106,7 @@ export default function ContentScreen() {
     Alert.alert("Sucesso", "Conteúdo guardado com sucesso!");
   };
 
-  const deleteSavedContent = (id: string) => {
-    Alert.alert(
-      "Eliminar Conteúdo",
-      "Tem certeza que deseja eliminar este conteúdo?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: () => {
-            console.log("Eliminando conteúdo com ID:", id);
-            const newContents = savedContents.filter(c => c.id !== id);
-            setSavedContents(newContents);
-            console.log("Conteúdo eliminado. Total restante:", newContents.length);
-            Alert.alert("Sucesso", "Conteúdo eliminado com sucesso!");
-          },
-        },
-      ]
-    );
-  };
+
 
   const loadContent = (saved: SavedContent) => {
     setSelectedType(saved.type);
@@ -356,14 +334,6 @@ export default function ContentScreen() {
                     {saved.prompt}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.savedDeleteButton}
-                  onPress={() => deleteSavedContent(saved.id)}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                >
-                  <Trash2 size={18} color="#dc2626" />
-                </TouchableOpacity>
               </View>
             ))}
           </View>
@@ -576,13 +546,5 @@ const styles = StyleSheet.create({
     color: "#374151",
     lineHeight: 20,
   },
-  savedDeleteButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: "#fee2e2",
-    alignItems: "center",
-    justifyContent: "center",
-    marginLeft: 12,
-  },
+
 });

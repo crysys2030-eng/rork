@@ -318,12 +318,15 @@ export default function ContentScreen() {
           <View style={styles.savedSection}>
             <Text style={styles.savedTitle}>Conteúdos Guardados</Text>
             {savedContents.map((saved) => (
-              <TouchableOpacity 
+              <View 
                 key={saved.id} 
                 style={styles.savedCard}
-                onPress={() => loadContent(saved)}
               >
-                <View style={styles.savedCardContent}>
+                <TouchableOpacity 
+                  style={styles.savedCardContent}
+                  onPress={() => loadContent(saved)}
+                  activeOpacity={0.7}
+                >
                   <View style={styles.savedCardHeader}>
                     <Text style={styles.savedCardType}>{getContentTypeTitle()}</Text>
                     <Text style={styles.savedCardDate}>
@@ -338,17 +341,16 @@ export default function ContentScreen() {
                   <Text style={styles.savedCardPrompt} numberOfLines={2}>
                     {saved.prompt}
                   </Text>
-                </View>
+                </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.savedDeleteButton}
                   onPress={() => deleteSavedContent(saved.id)}
-                  onPressIn={(e) => e.stopPropagation()}
                   activeOpacity={0.7}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
                   <Trash2 size={18} color="#dc2626" />
                 </TouchableOpacity>
-              </TouchableOpacity>
+              </View>
             ))}
           </View>
         )}

@@ -359,7 +359,8 @@ export default function ContentScreen() {
                   style={styles.deleteIconButton}
                   onPress={() => deleteContent(saved.id)}
                 >
-                  <Trash2 size={20} color="#dc2626" />
+                  <Trash2 size={16} color="#dc2626" />
+                  <Text style={styles.deleteIconButtonText}>Eliminar</Text>
                 </TouchableOpacity>
               </View>
             ))}
@@ -574,10 +575,20 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   deleteIconButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: "#fee2e2",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 6,
+    padding: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: "#fee2e2",
+    borderWidth: 1,
+    borderColor: "#fecaca",
+  },
+  deleteIconButtonText: {
+    fontSize: 13,
+    fontWeight: "600" as const,
+    color: "#dc2626",
   },
 });

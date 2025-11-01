@@ -238,7 +238,8 @@ export default function ContactsScreen() {
                 style={styles.deleteIconButton}
                 onPress={() => deleteContact(contact.id, contact.name)}
               >
-                <Trash2 size={20} color="#dc2626" />
+                <Trash2 size={18} color="#dc2626" />
+                <Text style={styles.deleteIconButtonText}>Eliminar</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -464,6 +465,7 @@ const styles = StyleSheet.create({
   },
   contactDetails: {
     gap: 6,
+    marginBottom: 12,
   },
   contactDetailRow: {
     flexDirection: "row",
@@ -475,14 +477,21 @@ const styles = StyleSheet.create({
     color: "#6b7280",
   },
   deleteIconButton: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: "#fee2e2",
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: "#fee2e2",
+    borderWidth: 1,
+    borderColor: "#fecaca",
+  },
+  deleteIconButtonText: {
+    fontSize: 13,
+    fontWeight: "600" as const,
+    color: "#dc2626",
   },
   modalOverlay: {
     flex: 1,

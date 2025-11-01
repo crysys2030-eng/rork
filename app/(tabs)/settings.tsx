@@ -37,7 +37,7 @@ type SettingItemSwitch = {
 type SettingItem = SettingItemButton | SettingItemSwitch;
 
 export default function SettingsScreen() {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser } = useAuth();
   const router = useRouter();
   const [notifications, setNotifications] = useState<boolean>(true);
   const [emailAlerts, setEmailAlerts] = useState<boolean>(false);
@@ -114,15 +114,12 @@ export default function SettingsScreen() {
     }
 
     try {
-      const updatedUser = {
-        ...user,
+      await updateUser({
         name: editName,
         email: editEmail,
-      };
-      await AsyncStorage.setItem("current_user", JSON.stringify(updatedUser));
+      });
       setProfileModalVisible(false);
       Alert.alert("Sucesso", "Perfil atualizado com sucesso!");
-      console.log("Perfil atualizado:", updatedUser);
     } catch (error) {
       console.error("Erro ao salvar perfil:", error);
       Alert.alert("Erro", "Não foi possível salvar o perfil");

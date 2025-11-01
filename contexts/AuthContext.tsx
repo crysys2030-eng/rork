@@ -19,6 +19,7 @@ type AuthState = {
   loginAsGuest: () => Promise<void>;
   logout: () => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  updateUser: (userData: Partial<User>) => Promise<void>;
 };
 
 const STORAGE_KEY = '@auth_user';
@@ -141,6 +142,20 @@ export const [AuthProvider, useAuth] = createContextHook<AuthState>(() => {
     }
   }, [saveUser]);
 
+  const updateUser = useCallback(async (userData: Partial<User>) => {
+    try {
+      if (!user) return;
+      
+      const updatedUser = { ...user, ...userData };
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+      setUser(updatedUser);
+      console.log('Utilizador atualizado:', updatedUser);
+    } catch (error) {
+      console.error('Erro ao atualizar utilizador:', error);
+      throw error;
+    }
+  }, [user]);
+
   return useMemo(() => ({
     user,
     isLoading,
@@ -149,5 +164,6 @@ export const [AuthProvider, useAuth] = createContextHook<AuthState>(() => {
     loginAsGuest,
     logout,
     register,
-  }), [user, isLoading, login, loginAsGuest, logout, register]);
+    updateUser,
+  }), [user, isLoading, login, loginAsGuest, logout, register, updateUser]);
 });

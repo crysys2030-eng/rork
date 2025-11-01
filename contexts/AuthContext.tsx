@@ -144,26 +144,34 @@ export const [AuthProvider, useAuth] = createContextHook<AuthState>(() => {
 
   const updateUser = useCallback(async (userData: Partial<User>) => {
     try {
-      if (!user) return;
+      setUser(currentUser => {
+        if (!currentUser) return currentUser;
+        return { ...currentUser, ...userData };
+      });
       
-      const updatedUser = { ...user, ...userData };
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
-      setUser(updatedUser);
-      console.log('Utilizador atualizado:', updatedUser);
+      const storedUser = await AsyncStorage.getItem(STORAGE_KEY);
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        const updatedUser = { ...parsedUser, ...userData };
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+        console.log('Utilizador atualizado:', updatedUser);
+      }
     } catch (error) {
       console.error('Erro ao atualizar utilizador:', error);
       throw error;
     }
-  }, [user]);
+  }, []);
 
-  return useMemo(() => ({
+  const isAuthenticated = useMemo(() => !!user, [user]);
+
+  return {
     user,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated,
     login,
     loginAsGuest,
     logout,
     register,
     updateUser,
-  }), [user, isLoading, login, loginAsGuest, logout, register, updateUser]);
+  };
 });

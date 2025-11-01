@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from "react-native";
 import { Stack } from "expo-router";
-import { Calendar, MapPin, Clock, Plus, Search, X } from "lucide-react-native";
+import { Calendar, MapPin, Clock, Plus, Search, X, Trash2 } from "lucide-react-native";
 import React, { useState } from "react";
 
 type Event = {
@@ -77,6 +77,27 @@ export default function AgendaScreen() {
       type: "meeting",
     });
     Alert.alert("Sucesso", "Evento adicionado com sucesso!");
+  };
+
+  const deleteEvent = (id: string, title: string) => {
+    Alert.alert(
+      "Eliminar Evento",
+      `Tem certeza que deseja eliminar "${title}"?`,
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => {
+            setEvents(events.filter((e) => e.id !== id));
+            Alert.alert("Sucesso", "Evento eliminado com sucesso!");
+          },
+        },
+      ]
+    );
   };
 
 
@@ -164,6 +185,14 @@ export default function AgendaScreen() {
                   <Text style={styles.eventDetailText}>{event.location}</Text>
                 </View>
               </View>
+              
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => deleteEvent(event.id, event.title)}
+              >
+                <Trash2 size={18} color="#dc2626" />
+                <Text style={styles.deleteButtonText}>Eliminar</Text>
+              </TouchableOpacity>
             </View>
           </View>
         ))}
@@ -364,7 +393,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6b7280",
   },
-
+  deleteButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    marginTop: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: "#fee2e2",
+    borderWidth: 1,
+    borderColor: "#fecaca",
+  },
+  deleteButtonText: {
+    fontSize: 13,
+    fontWeight: "600" as const,
+    color: "#dc2626",
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

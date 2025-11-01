@@ -10,7 +10,7 @@ import {
   Platform 
 } from "react-native";
 import { Stack } from "expo-router";
-import { Sparkles, FileText, Share2, Copy, Download, Save } from "lucide-react-native";
+import { Sparkles, FileText, Share2, Copy, Download, Save, Trash2 } from "lucide-react-native";
 import React, { useState } from "react";
 import { generateText } from "@/utils/ai";
 import * as Print from "expo-print";
@@ -104,6 +104,27 @@ export default function ContentScreen() {
     
     setSavedContents([newSavedContent, ...savedContents]);
     Alert.alert("Sucesso", "Conteúdo guardado com sucesso!");
+  };
+
+  const deleteContent = (id: string) => {
+    Alert.alert(
+      "Eliminar Conteúdo",
+      "Tem certeza que deseja eliminar este conteúdo?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => {
+            setSavedContents(savedContents.filter((c) => c.id !== id));
+            Alert.alert("Sucesso", "Conteúdo eliminado com sucesso!");
+          },
+        },
+      ]
+    );
   };
 
 
@@ -334,6 +355,12 @@ export default function ContentScreen() {
                     {saved.prompt}
                   </Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.deleteIconButton}
+                  onPress={() => deleteContent(saved.id)}
+                >
+                  <Trash2 size={20} color="#dc2626" />
+                </TouchableOpacity>
               </View>
             ))}
           </View>
@@ -546,5 +573,11 @@ const styles = StyleSheet.create({
     color: "#374151",
     lineHeight: 20,
   },
-
+  deleteIconButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: "#fee2e2",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

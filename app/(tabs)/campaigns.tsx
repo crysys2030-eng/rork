@@ -10,7 +10,7 @@ import {
   ActivityIndicator 
 } from "react-native";
 import { Stack } from "expo-router";
-import { Target, Search, Plus, X, Calendar, Users, TrendingUp, Sparkles } from "lucide-react-native";
+import { Target, Search, Plus, X, Calendar, Users, TrendingUp, Sparkles, Trash2 } from "lucide-react-native";
 import React, { useState } from "react";
 import { generateText } from "@/utils/ai";
 
@@ -153,6 +153,27 @@ A estratégia deve ser profissional, realista e adaptada ao contexto político p
     Alert.alert("Sucesso", "Campanha criada com sucesso!");
   };
 
+  const deleteCampaign = (id: string, name: string) => {
+    Alert.alert(
+      "Eliminar Campanha",
+      `Tem certeza que deseja eliminar "${name}"?`,
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => {
+            setCampaigns(campaigns.filter((c) => c.id !== id));
+            Alert.alert("Sucesso", "Campanha eliminada com sucesso!");
+          },
+        },
+      ]
+    );
+  };
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -242,6 +263,14 @@ A estratégia deve ser profissional, realista e adaptada ao contexto político p
                 <Text style={styles.detailText}>Orçamento: {campaign.budget}</Text>
               </View>
             </View>
+
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => deleteCampaign(campaign.id, campaign.name)}
+            >
+              <Trash2 size={18} color="#dc2626" />
+              <Text style={styles.deleteButtonText}>Eliminar</Text>
+            </TouchableOpacity>
           </View>
         ))}
 
@@ -610,6 +639,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: "#ffffff",
+  },
+  deleteButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: "#fee2e2",
+    borderWidth: 1,
+    borderColor: "#fecaca",
+  },
+  deleteButtonText: {
+    fontSize: 14,
+    fontWeight: "600" as const,
+    color: "#dc2626",
   },
   aiGenerateButton: {
     flexDirection: "row",

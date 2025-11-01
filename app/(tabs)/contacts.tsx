@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, Modal, Alert } from "react-native";
 import { Stack } from "expo-router";
-import { Users, Search, Plus, Phone, Mail, MapPin, X } from "lucide-react-native";
+import { Users, Search, Plus, Phone, Mail, MapPin, X, Trash2 } from "lucide-react-native";
 import React, { useState } from "react";
 
 type Contact = {
@@ -86,6 +86,27 @@ export default function ContactsScreen() {
       level: "supporter",
     });
     Alert.alert("Sucesso", "Contato adicionado com sucesso!");
+  };
+
+  const deleteContact = (id: string, name: string) => {
+    Alert.alert(
+      "Eliminar Contato",
+      `Tem certeza que deseja eliminar "${name}"?`,
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => {
+            setContacts(contacts.filter((c) => c.id !== id));
+            Alert.alert("Sucesso", "Contato eliminado com sucesso!");
+          },
+        },
+      ]
+    );
   };
 
 
@@ -212,6 +233,13 @@ export default function ContactsScreen() {
                   <Text style={styles.contactDetailText}>{contact.location}</Text>
                 </View>
               </View>
+              
+              <TouchableOpacity
+                style={styles.deleteIconButton}
+                onPress={() => deleteContact(contact.id, contact.name)}
+              >
+                <Trash2 size={20} color="#dc2626" />
+              </TouchableOpacity>
             </View>
           </View>
         ))}
@@ -446,7 +474,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#6b7280",
   },
-
+  deleteIconButton: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: "#fee2e2",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",

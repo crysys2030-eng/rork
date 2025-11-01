@@ -245,8 +245,15 @@ export default function SettingsScreen() {
           text: "Sair", 
           style: "destructive",
           onPress: async () => {
-            await logout();
-            router.replace('/login');
+            console.log("Iniciando logout...");
+            try {
+              await logout();
+              console.log("Logout concluído, redirecionando...");
+              router.replace('/login');
+            } catch (error) {
+              console.error("Erro ao fazer logout:", error);
+              Alert.alert("Erro", "Não foi possível terminar a sessão");
+            }
           }
         }
       ]

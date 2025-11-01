@@ -108,10 +108,14 @@ export const [AuthProvider, useAuth] = createContextHook<AuthState>(() => {
 
   const logout = useCallback(async () => {
     try {
+      console.log('Removendo utilizador do storage...');
       await AsyncStorage.removeItem(STORAGE_KEY);
+      console.log('Utilizador removido do storage');
       setUser(null);
+      console.log('Estado do utilizador limpo');
     } catch (error) {
       console.error('Error logging out:', error);
+      throw error;
     }
   }, []);
 

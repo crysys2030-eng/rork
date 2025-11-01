@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Switch, Alert, Linking } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { 
   User, 
   Bell, 
@@ -15,6 +15,7 @@ import {
   Trash2
 } from "lucide-react-native";
 import React, { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 type SettingItemButton = {
   icon: LucideIcon;
@@ -33,6 +34,8 @@ type SettingItemSwitch = {
 type SettingItem = SettingItemButton | SettingItemSwitch;
 
 export default function SettingsScreen() {
+  const { user, logout } = useAuth();
+  const router = useRouter();
   const [notifications, setNotifications] = useState<boolean>(true);
   const [emailAlerts, setEmailAlerts] = useState<boolean>(false);
   const [darkMode, setDarkMode] = useState<boolean>(false);
@@ -150,7 +153,10 @@ export default function SettingsScreen() {
         { 
           text: "Sair", 
           style: "destructive",
-          onPress: () => console.log("Utilizador desconectado")
+          onPress: async () => {
+            await logout();
+            router.replace('/login');
+          }
         }
       ]
     );
@@ -251,8 +257,13 @@ export default function SettingsScreen() {
               <User size={32} color="#2563eb" />
             </View>
             <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>Campanha 2024</Text>
-              <Text style={styles.profileEmail}>campanha@exemplo.com</Text>
+              <Text style={styles.profileName}>{user?.name || "Campanha 2024"}</Text>
+              <Text style={styles.profileEmail}>{user?.email || "campanha@exemplo.com"}</Text>
+              <View style={styles.roleBadge}>
+                <Text style={styles.roleText}>
+                  {user?.role === 'admin' ? 'Administrador' : user?.role === 'user' ? 'Utilizador' : 'Convidado'}
+                </Text>
+              </View>
             </View>
           </View>
         </View>
@@ -419,5 +430,18 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "#9ca3af",
     textAlign: "center",
+  },
+  roleBadge: {
+    marginTop: 8,
+    alignSelf: "flex-start",
+    backgroundColor: "#dbeafe",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  roleText: {
+    fontSize: 12,
+    fontWeight: "600" as const,
+    color: "#2563eb",
   },
 });

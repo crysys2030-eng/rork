@@ -11,7 +11,7 @@ import {
 import { Stack } from "expo-router";
 import { MessageSquare, TrendingUp, TrendingDown, Minus } from "lucide-react-native";
 import React, { useState } from "react";
-import { generateText } from "@rork/toolkit-sdk";
+import { generateText } from "@/utils/ai";
 
 type SentimentResult = {
   overall: "positive" | "negative" | "neutral";

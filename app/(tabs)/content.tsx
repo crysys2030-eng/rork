@@ -12,7 +12,7 @@ import {
 import { Stack } from "expo-router";
 import { Sparkles, FileText, Share2, Copy, Download, Save } from "lucide-react-native";
 import React, { useState } from "react";
-import { generateText } from "@rork/toolkit-sdk";
+import { generateText } from "@/utils/ai";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import * as Clipboard from "expo-clipboard";

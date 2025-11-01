@@ -8,7 +8,7 @@ import {
 import { Stack } from "expo-router";
 import { BarChart3, TrendingUp, Users, Calendar, Target, Sparkles } from "lucide-react-native";
 import React, { useState, useEffect } from "react";
-import { generateText } from "@rork/toolkit-sdk";
+import { generateText } from "@/utils/ai";
 
 type TimePeriod = "week" | "month" | "year";
 

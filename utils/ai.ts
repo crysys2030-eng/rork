@@ -3,10 +3,15 @@ type ImagePart = { type: "image"; image: string };
 type UserMessage = { role: "user"; content: string | (TextPart | ImagePart)[] };
 type AssistantMessage = { role: "assistant"; content: string | TextPart[] };
 
-export async function generateText(params: {
-  messages: (UserMessage | AssistantMessage)[];
-}): Promise<string> {
-  const url = "https://toolkit.rork.com/llm/generate";
+export async function generateText(
+  params: string | { messages: (UserMessage | AssistantMessage)[] }
+): Promise<string> {
+  const messages = typeof params === "string"
+    ? [{ role: "user" as const, content: params }]
+    : params.messages;
+
+  const baseUrl = process.env.EXPO_PUBLIC_TOOLKIT_URL || "https://toolkit.rork.com";
+  const url = new URL("/llm/generate", baseUrl).toString();
 
   try {
     const response = await fetch(url, {
@@ -14,13 +19,18 @@ export async function generateText(params: {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        messages: params.messages,
-      }),
+      body: JSON.stringify({ messages }),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorText = await response.text().catch(() => "Unknown error");
+      console.error("AI API Error:", {
+        status: response.status,
+        statusText: response.statusText,
+        body: errorText,
+        url
+      });
+      throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();

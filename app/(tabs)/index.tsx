@@ -11,7 +11,8 @@ import {
   BarChart3,
   BookOpen,
   Sparkles,
-  MessageCircle
+  MessageCircle,
+  AlertTriangle
 } from "lucide-react-native";
 import React, { useState } from "react";
 
@@ -54,6 +55,10 @@ export default function DashboardScreen() {
 
   const handleSocialMonitor = () => {
     router.push("/social-monitor");
+  };
+
+  const handleCrisisResponse = () => {
+    router.push("/crisis-response");
   };
 
   const createCampaign = () => {
@@ -194,6 +199,14 @@ export default function DashboardScreen() {
               </View>
               <Text style={styles.toolTitle}>Monitor de Redes</Text>
               <Text style={styles.toolDescription}>Acompanhe tendências</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.toolCard} onPress={handleCrisisResponse}>
+              <View style={[styles.toolIcon, { backgroundColor: "#fef2f2" }]}>
+                <AlertTriangle size={24} color="#dc2626" />
+              </View>
+              <Text style={styles.toolTitle}>Gestão de Crises</Text>
+              <Text style={styles.toolDescription}>Respostas rápidas</Text>
             </TouchableOpacity>
           </View>
         </View>

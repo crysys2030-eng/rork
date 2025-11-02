@@ -248,8 +248,11 @@ export default function SettingsScreen() {
             console.log("Iniciando logout...");
             try {
               await logout();
-              console.log("Logout concluído, redirecionando...");
-              router.replace('/login');
+              console.log("Logout concluído com sucesso");
+              console.log("Redirecionando para login...");
+              setTimeout(() => {
+                router.replace('/login');
+              }, 100);
             } catch (error) {
               console.error("Erro ao fazer logout:", error);
               Alert.alert("Erro", "Não foi possível terminar a sessão");
